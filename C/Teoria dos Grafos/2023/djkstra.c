@@ -1,6 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Rabito and Rayito are playing a nice game. They start with a weighted bidirectional connected graph (all weights are positive) and a set of K bones placed on some of the vertices.
+
+// They start taking turns with Rabito playing first. The game consists of moving the bones through the graph towards the vertex 1. 
+// On a turn one the players takes a subset of at least 1 and at most P of the bones (that have not reached the vertex 1) 
+// and moves these bones through one or more of the edges of the graph (the bones moves are independent of each other) 
+// subject to this condition: he may use a particular edge for a bone if it makes that bone eventually reach the vertex 1 using the least possible amount of time 
+// (it takes A units of time to move a bone through and edge of weight A) and if the edge makes this bone eventually reach the vertex 1 using the largest amount of edges.
+
+// There's a huge bone waiting for the winner of the game, 
+// so your task is to decide which of the two dogs will triumph on this game and have a nice meal 
+// (assuming both of the dogs play with an optimal strategy). The loser of the game is, of course, the dog that cannot make a move.
+
+// Input:
+// The first line contains a single integer T (T <= 100) the number of test cases. The description of T test cases follows. 
+// A test case begins with a line containing two integers N, M (1 <= N <= 100, 1 <= M <= 2000) 
+// denoting the number of vertices and edges of the graph, then follow M lines each with three integers u, v, w (1 <= u, v <= N) (0 < w <= 1000000) 
+// representing the vertices of the i-th edges and its weight. Then a line with two integers K (0 < K <= 1000) and P (0 < P) 
+// denoting the number of bones initially placed on the graph and the parameter P as described in the problem statement. 
+// Finally a single line containing K integers describing the initial positions of the K bones.
+
+// Output
+// Output T lines, one for each test case. If Rabito has a strategy that will guarantee his victory output "Yes", otherwise output "No".
+
 int count = 1;
 
 typedef struct elemento {
@@ -52,22 +75,24 @@ int empty();
 void djikstra(vertice *vertices, int raiz);
 void inicializar_distancias(vertice *vertices);
 
-int main(int *argc, char *argv[]) {
+int main() {
     vertice *vertices;
     int qtd_vertices, i;
-    printf(" Parametro recebido: %s", argv[1]);
     vertices = (vertice *)calloc(10001, sizeof(vertice));
-    qtd_vertices = carrega_grafo(vertices, argv[1]);
+    qtd_vertices = carrega_grafo(vertices, "D:/DOCUMENTOS/FACULDADE/Git/MAIN/C/Teoria dos Grafos/2023/djkstra.txt");
     if (qtd_vertices) {
         printf("\n Grafo carregado com sucesso qtd vertices: %d", qtd_vertices);
         mostrar_lista_dos_vertices(vertices, 10001);
     } else
         printf("\n Problema no carregamento do grafo");
 
-    djikstra(vertices, 5);
+    printf("\nDigite qual a raiz a ser usada:\n");
+    int raizGrafo=0;
+    scanf("%d", &raizGrafo);
+    djikstra(vertices, raizGrafo);//vertices e raiz
 
     for (i = 1; i <= qtd_vertices; i++) {
-        printf("\n Distancia do no Raiz até %d = %d", i, vertices[i].distancia);
+        printf("\n Distancia do vertice %d para a raiz = %d", i, vertices[i].distancia);
     }
 
     printf("\n");

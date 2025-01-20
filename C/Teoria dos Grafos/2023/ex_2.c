@@ -27,14 +27,17 @@ int bfs(vertice *v, int raiz, int qtd_vertices);
 fila *aloca_Fila();
 lista *aloca_Lista();
 registro *aloca_Registro();
-int incluiLista(lista *l, int valor_inserido);
+int incluir_lista(lista *l, int x);
 void push(vertice *v, int valor);
-void colocaFila(fila *minhaFila, int elemento);
-int tiraFila(fila *minhaFila);
+void push_FilaBFS(fila *f, int x);
+int pop_FilaBFS(fila *f);
 
 int main(){
-    int qtd_vertices, qtd_arestas;
-    int i, a, b;
+    
+    int qtd_vertices;
+    int qtd_arestas;
+    int i;
+    int a,b;
     int qtd_casos=0;
     vertice *vertices;
 
@@ -42,7 +45,7 @@ int main(){
 
     while(qtd_casos--){
         scanf("%d %d", &qtd_vertices, &qtd_arestas);
-        vertices= (vertice *)calloc(10000, sizeof(vertice));
+        vertices= (vertice *)calloc(10001, sizeof(vertice));
 
         for(i=0; i< qtd_arestas; i++){
             scanf("%d %d", &a, &b);
@@ -73,9 +76,10 @@ registro *aloca_Registro(){
     return novo;
 }
 
-int incluiLista(lista *l, int valor_inserido){
+int incluir_lista(lista *l, int x){
+
     registro *novo= aloca_Registro();
-    novo->valor= valor_inserido;
+    novo->valor= x;
     novo->proximo=NULL;
 
     if(l->inicio==NULL){
@@ -96,40 +100,48 @@ int incluiLista(lista *l, int valor_inserido){
 }
 
 void push(vertice *v, int valor){
+
     if(v->lista_adj==NULL){
         v->lista_adj= aloca_Lista();
     }
-    incluiLista(v->lista_adj, valor);
+    incluir_lista(v->lista_adj, valor);
 }
 
-void colocaFila(fila *minhaFila, int elemento){
-    registro *novoRegistro= aloca_Registro();
-    novoRegistro->valor= elemento;
+int pop_FilaBFS(fila *f){
 
-    if(minhaFila->inicio==NULL){
-        minhaFila->inicio=novoRegistro;
-        minhaFila->fim=novoRegistro;
-        minhaFila->tam++;
+    int aux;
+    aux= f->inicio->valor;
+    f->inicio=f->inicio->proximo;
+    f->tam--;
+
+    return aux;
+}
+
+void push_FilaBFS(fila *f, int x){
+
+    registro *novo= aloca_Registro();
+    novo->valor= x;
+
+    if(f->inicio==NULL){
+
+        f->inicio=novo;
+        f->fim=novo;
+        f->tam++;
         return;
     }
 
-    minhaFila->fim->proximo= novoRegistro;
-    minhaFila->fim= novoRegistro;
-    minhaFila->tam++;
+    f->fim->proximo= novo;
+    f->fim= novo;
+    f->tam++;
+
 }
 
-int tiraFila(fila *minhaFila){
-    int retorno;
-    retorno= minhaFila->inicio->valor;
-    minhaFila->inicio=minhaFila->inicio->proximo;
-    minhaFila->tam--;
-
-    return retorno;
-}
 
 int bfs(vertice *v, int raiz, int qtd_vertices){
-    fila *minhaFila= aloca_Fila();
-    int current;
+
+    fila *f= aloca_Fila();
+
+    int atual;
     registro *aux;
 
     for(int i=0; i<qtd_vertices; i++){
@@ -137,22 +149,24 @@ int bfs(vertice *v, int raiz, int qtd_vertices){
         v[i].distancia=-1;
     }
 
-    colocaFila(minhaFila, raiz);
+    push_FilaBFS(f, raiz);
     v[raiz].visitado=1;
     v[raiz].distancia=0;
 
-    while(minhaFila->tam>0){
-        current= tiraFila(minhaFila);
-        aux= v[current].lista_adj->inicio;
+    while(f->tam>0){
+
+        atual= pop_FilaBFS(f);
+        aux= v[atual].lista_adj->inicio;
 
         while(aux!= NULL){
             if(v[aux->valor].visitado==0){
                 v[aux->valor].visitado=1;
-                colocaFila(minhaFila,aux->valor);
-                v[aux->valor].distancia= v[current].distancia + 1;
+                push_FilaBFS(f,aux->valor);
+                v[aux->valor].distancia= v[atual].distancia + 1;
             }
             aux=aux->proximo;
         }
+
     }
     return v[qtd_vertices].distancia;
 }
